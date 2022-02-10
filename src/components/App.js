@@ -1,5 +1,5 @@
 import Navbar from "./NavBar";
-import { Switch, Route, Redirect } from "react-router-dom";
+import { Switch, Route} from "react-router-dom";
 import React from "react";
 import Container from "./layout/Container";
 import PremisesPage from "./premises/PremisesPage";
