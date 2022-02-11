@@ -3,6 +3,7 @@ import React, { useState, useReducer, useRef, useEffect } from "react";
 import { Modal } from "bootstrap";
 import { ModalForm } from "../ModalForm";
 import Table from "../layout/Table";
+import { findAllPremises } from "../api/apiService";
 
 const premisesListReducer = (state, action) => {
   switch (action.type) {
@@ -26,6 +27,9 @@ const PremisesPage = (props) => {
 
   useEffect(() => {
     setModal(new Modal(exampleModal.current));
+    findAllPremises()
+      .then((data) => dispatch({ type: "SET_ALL", payload: data }))
+      .catch((err) => console.log(err));
   }, []);
 
   const handleAddPremises = (premises) => {
@@ -36,7 +40,7 @@ const PremisesPage = (props) => {
 
   if (premisesList.length > 0) {
     const headJsx = (
-      <tr>
+      <tr key={"table-columns"}>
         <th scope="col">Lokalnamn</th>
         <th scope="col">Gatuaddress</th>
         <th scope="col">Postnummer</th>
@@ -54,7 +58,12 @@ const PremisesPage = (props) => {
           <td>
             <div className="d-flex gap-1">
               <button className="btn btn-sm btn-primary">Update</button>
-              <button className="btn btn-sm btn-primary">Details</button>
+              <Link
+                className="btn btn-sm btn-primary"
+                to={`premises/${premises.id}`}
+              >
+                Details
+              </Link>
               <button
                 onClick={() =>
                   dispatch({ type: "REMOVE", payload: premises.id })
@@ -82,10 +91,9 @@ const PremisesPage = (props) => {
           </li>
         </ul>
         <div>
-          <button
-            className="btn btn-success"
-            onClick={() => modal.show()}
-          >Lägg till ny lokal</button>
+          <button className="btn btn-success" onClick={() => modal.show()}>
+            Lägg till ny lokal
+          </button>
         </div>
       </div>
 
