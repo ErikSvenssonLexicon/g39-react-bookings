@@ -1,15 +1,22 @@
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, useRef, Fragment } from "react";
 import { useParams } from "react-router-dom";
+import { Modal } from "bootstrap";
 import { findPremisesById } from "../api/apiService";
 import Table from "../layout/Table";
+import BookingForm from "../bookings/BookingForm";
 
 const Premises = (props) => {
   const params = useParams();
   const id = params.id;
+
+  const [bookingForm, setBookingForm] = useState(null);
+  const bookingFormRef = useRef();
+
   const [premises, setPremises] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    setBookingForm(new Modal(bookingFormRef.current));
     findPremisesById(id).then((data) => {
       if (data.status) {
         setError((old) => data);
@@ -33,7 +40,7 @@ const Premises = (props) => {
     const bodyJsx = premises.bookings.map((booking) => {
       return (
         <tr className="align-middle" id={booking.id} key={booking.id}>
-          <td>{booking.dateTime}</td>
+          <td>{booking.dateTime.replace("T", " ")}</td>
           <td>{`${booking.price} SEK`}</td>
           <td>{booking.vaccineType}</td>
           <td>
@@ -50,16 +57,26 @@ const Premises = (props) => {
     table = <Table className="table-hover" thead={headJsx} tbody={bodyJsx} />;
   }
 
+  const handleAddBooking = (booking) =>{
+    console.log(booking);  
+  }
+
   return (
     <div className="card mt-5">
       <div className="card-header">
         <div className="nav d-flex justify-content-between align-items-center text-center">
           <div className="d-flex gap-2">
-            <button className="btn btn-primary">Uppdatera</button>
+            <button className="btn btn-primary" disabled={error}>Uppdatera</button>
           </div>
         </div>
       </div>
       <div className="card-body">
+        <BookingForm
+          ref={bookingFormRef}
+          premisesId={id}
+          modal={bookingForm}
+          handleAddBooking={handleAddBooking}
+        />
         {premises && (
           <Fragment>
             <h5 className="card-title mb-2">{`Lokal: ${premises.name}`}</h5>
@@ -71,7 +88,12 @@ const Premises = (props) => {
             <hr />
             <div className="d-flex justify-content-between align-items-center">
               <h5 className="card-subtitle">Upplagda tider:</h5>
-              <button className="btn btn-success">Skapa bokning</button>
+              <button
+                onClick={() => bookingForm.show()}
+                className="btn btn-success"
+              >
+                Skapa bokning
+              </button>
             </div>
             {table ? (
               table
