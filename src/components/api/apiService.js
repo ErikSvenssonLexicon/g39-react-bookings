@@ -41,3 +41,17 @@ export const findPremisesById = async (id) => {
     return err.response.data;
   }
 };
+
+export const deleteBooking = async (id) => {
+  try{
+    const response = await axios({
+      method: "delete",
+      url: `http://localhost:8080/api/v1/bookings/${id}`      
+    }  
+
+    )
+    return response;
+  }catch(err){
+    return err;
+  }
+}

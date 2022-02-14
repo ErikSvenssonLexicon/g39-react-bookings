@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, Fragment } from "react";
 import { useParams } from "react-router-dom";
 import { Modal } from "bootstrap";
-import { findPremisesById } from "../api/apiService";
+import { findPremisesById, deleteBooking } from "../api/apiService";
 import Table from "../layout/Table";
 import BookingForm from "../bookings/BookingForm";
 
@@ -11,9 +11,12 @@ const Premises = (props) => {
 
   const [bookingForm, setBookingForm] = useState(null);
   const bookingFormRef = useRef();
+  const removeId = useRef(null);
 
   const [premises, setPremises] = useState(null);
   const [error, setError] = useState(null);
+  const [isRemove, setIsRemove] = useState(false);
+  
 
   useEffect(() => {
     setBookingForm(new Modal(bookingFormRef.current));
@@ -25,6 +28,33 @@ const Premises = (props) => {
       }
     });
   }, [id]);
+
+  useEffect(() => {
+    if(isRemove){
+      deleteBooking(removeId.current)
+        .then(response => {
+          if(response.status && response.status === 204){            
+            setPremises(oldState => {
+              console.log(oldState)
+              return {
+                ...oldState,
+                bookings: oldState.bookings.filter(booking => booking.id !== removeId.current)
+              }
+            });              
+          }else{
+            console.log(response);
+          }
+        })    
+    }
+    return () => {      
+      setIsRemove(false);
+    }
+  },[isRemove])
+
+  const handleRemoveBooking = (id) =>{
+    removeId.current = id;
+    setIsRemove(true);    
+  }
 
   let table = null;
   if (premises && premises.bookings.length > 0) {
@@ -47,7 +77,7 @@ const Premises = (props) => {
             <div className="d-flex">
               <button className="btn btn-info text-white me-2">Visa</button>
               <button className="btn btn-primary me-2">Ändra</button>
-              <button className="btn btn-danger">Ta bort</button>
+              <button className="btn btn-danger" onClick={() => handleRemoveBooking(booking.id)}>Ta bort</button>
             </div>
           </td>
         </tr>
@@ -57,8 +87,8 @@ const Premises = (props) => {
     table = <Table className="table-hover" thead={headJsx} tbody={bodyJsx} />;
   }
 
-  const handleAddBooking = (booking) =>{
-    console.log(booking);  
+  const handleAddBooking = (updatedPremises) =>{    
+    setPremises(oldState => updatedPremises);  
   }
 
   return (
