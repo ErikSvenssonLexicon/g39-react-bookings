@@ -42,16 +42,28 @@ export const findPremisesById = async (id) => {
   }
 };
 
+export const updatePremises = async (premises) => {
+  try {
+    const response = await axios({
+      method: "put",
+      url: `http://localhost:8080/api/v1/premises/${premises.id}`,
+      data: premises,
+    });
+
+    return response.data;
+  } catch (err) {
+    return err.response.data;
+  }
+};
+
 export const deleteBooking = async (id) => {
-  try{
+  try {
     const response = await axios({
       method: "delete",
-      url: `http://localhost:8080/api/v1/bookings/${id}`      
-    }  
-
-    )
+      url: `http://localhost:8080/api/v1/bookings/${id}`,
+    });
     return response;
-  }catch(err){
+  } catch (err) {
     return err;
   }
-}
+};

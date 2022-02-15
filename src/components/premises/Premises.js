@@ -4,57 +4,61 @@ import { Modal } from "bootstrap";
 import { findPremisesById, deleteBooking } from "../api/apiService";
 import Table from "../layout/Table";
 import BookingForm from "../bookings/BookingForm";
+import { PremisesUpdateForm } from "./PremisesUpdateForm";
 
 const Premises = (props) => {
   const params = useParams();
   const id = params.id;
 
   const [bookingForm, setBookingForm] = useState(null);
+  const [updateForm, setUpdateForm] = useState(null);
   const bookingFormRef = useRef();
+  const updateFormRef = useRef();
   const removeId = useRef(null);
 
   const [premises, setPremises] = useState(null);
   const [error, setError] = useState(null);
   const [isRemove, setIsRemove] = useState(false);
-  
 
   useEffect(() => {
-    setBookingForm(new Modal(bookingFormRef.current));
     findPremisesById(id).then((data) => {
       if (data.status) {
         setError((old) => data);
       } else {
         setPremises((old) => data);
       }
+      setBookingForm(new Modal(bookingFormRef.current));
+      setUpdateForm(new Modal(updateFormRef.current));
     });
   }, [id]);
 
   useEffect(() => {
-    if(isRemove){
-      deleteBooking(removeId.current)
-        .then(response => {
-          if(response.status && response.status === 204){            
-            setPremises(oldState => {
-              console.log(oldState)
-              return {
-                ...oldState,
-                bookings: oldState.bookings.filter(booking => booking.id !== removeId.current)
-              }
-            });              
-          }else{
-            console.log(response);
-          }
-        })    
+    if (isRemove) {
+      deleteBooking(removeId.current).then((response) => {
+        if (response.status && response.status === 204) {
+          setPremises((oldState) => {
+            console.log(oldState);
+            return {
+              ...oldState,
+              bookings: oldState.bookings.filter(
+                (booking) => booking.id !== removeId.current
+              ),
+            };
+          });
+        } else {
+          console.log(response);
+        }
+      });
     }
-    return () => {      
+    return () => {
       setIsRemove(false);
-    }
-  },[isRemove])
+    };
+  }, [isRemove]);
 
-  const handleRemoveBooking = (id) =>{
+  const handleRemoveBooking = (id) => {
     removeId.current = id;
-    setIsRemove(true);    
-  }
+    setIsRemove(true);
+  };
 
   let table = null;
   if (premises && premises.bookings.length > 0) {
@@ -75,9 +79,13 @@ const Premises = (props) => {
           <td>{booking.vaccineType}</td>
           <td>
             <div className="d-flex">
-              <button className="btn btn-info text-white me-2">Visa</button>
-              <button className="btn btn-primary me-2">Ändra</button>
-              <button className="btn btn-danger" onClick={() => handleRemoveBooking(booking.id)}>Ta bort</button>
+              <button className="btn btn-info text-white me-2">Visa</button>              
+              <button
+                className="btn btn-danger"
+                onClick={() => handleRemoveBooking(booking.id)}
+              >
+                Ta bort
+              </button>
             </div>
           </td>
         </tr>
@@ -87,8 +95,12 @@ const Premises = (props) => {
     table = <Table className="table-hover" thead={headJsx} tbody={bodyJsx} />;
   }
 
-  const handleAddBooking = (updatedPremises) =>{    
-    setPremises(oldState => updatedPremises);  
+  const handleAddBooking = (updatedPremises) => {
+    setPremises((oldState) => updatedPremises);
+  };
+
+  const handleSetUpdatedPremises = (updatedPremises) =>{
+    setPremises((oldState) => updatedPremises);
   }
 
   return (
@@ -96,7 +108,9 @@ const Premises = (props) => {
       <div className="card-header">
         <div className="nav d-flex justify-content-between align-items-center text-center">
           <div className="d-flex gap-2">
-            <button className="btn btn-primary" disabled={error}>Uppdatera</button>
+            <button className="btn btn-primary" disabled={error} onClick={() => updateForm.show()}>
+              Uppdatera
+            </button>
           </div>
         </div>
       </div>
@@ -107,8 +121,15 @@ const Premises = (props) => {
           modal={bookingForm}
           handleAddBooking={handleAddBooking}
         />
+
         {premises && (
           <Fragment>
+            <PremisesUpdateForm
+              ref={updateFormRef}
+              modal={updateForm}
+              _premises={premises}
+              handleSetUpdatedPremises = {handleSetUpdatedPremises}
+            />
             <h5 className="card-title mb-2">{`Lokal: ${premises.name}`}</h5>
             <hr />
             <h5 className="card-subtitle mb-2">Adress:</h5>

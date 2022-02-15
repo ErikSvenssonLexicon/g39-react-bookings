@@ -21,12 +21,12 @@ const premisesListReducer = (state, action) => {
 };
 
 const PremisesPage = (props) => {
-  const [modal, setModal] = useState(null);
-  const exampleModal = useRef();
+  const [modal, setModal] = useState(null);  
+  const exampleModal = useRef();  
   const [premisesList, dispatch] = useReducer(premisesListReducer, []);
 
   useEffect(() => {
-    setModal(new Modal(exampleModal.current));
+    setModal(new Modal(exampleModal.current));    
     findAllPremises()
       .then((data) => dispatch({ type: "SET_ALL", payload: data }))
       .catch((err) => console.log(err));
@@ -56,13 +56,12 @@ const PremisesPage = (props) => {
           <td>{premises.address.zipCode}</td>
           <td>{premises.address.city}</td>
           <td>
-            <div className="d-flex gap-1">
-              <button className="btn btn-sm btn-primary">Update</button>
+            <div className="d-flex gap-1">            
               <Link
                 className="btn btn-sm btn-primary"
                 to={`premises/${premises.id}`}
               >
-                Details
+                Visa
               </Link>
               <button
                 onClick={() =>
@@ -70,7 +69,7 @@ const PremisesPage = (props) => {
                 }
                 className="btn btn-sm btn-danger"
               >
-                Delete
+                Radera
               </button>
             </div>
           </td>
@@ -97,12 +96,12 @@ const PremisesPage = (props) => {
         </div>
       </div>
 
-      <div className="card-body">
+      <div className="card-body">        
         <ModalForm
           ref={exampleModal}
           modal={modal}
           handleAddPremises={handleAddPremises}
-        />
+        />        
 
         {table ? table : <p className="text-center">Skapa en lokal</p>}
       </div>
