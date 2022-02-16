@@ -1,28 +1,34 @@
 import { Link } from "react-router-dom";
-import React, { useState, useReducer, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPremisesList, setIsLoading, setError } from "../redux/reducers/premisesListSlice";
+import {
+  setPremisesList,
+  removePremises,
+  addPremises,
+} from "../redux/reducers/premisesListSlice";
 import { Modal } from "bootstrap";
 import { PremisesForm } from "./PremisesForm";
 import ModalDisplay from "../layout/ModalDisplay";
 import Table from "../layout/Table";
 import { findAllPremises } from "../api/apiService";
 
-const PremisesPage = (props) => {
+const PremisesPage = () => {
   const dispatch = useDispatch();
-  const {error, isLoading, premisesList} = useSelector(state => state.premisesListSlice);
-  const [modal, setModal] = useState(null);  
-  const exampleModal = useRef();  
+  const { error, isLoading, premisesList } = useSelector(
+    (state) => state.premisesListSlice
+  );
+  const [modal, setModal] = useState(null);
+  const exampleModal = useRef();
 
   useEffect(() => {
-    setModal(new Modal(exampleModal.current));    
+    setModal(new Modal(exampleModal.current));
     findAllPremises()
       .then((data) => dispatch(setPremisesList(data)))
       .catch((err) => console.log(err));
   }, [dispatch]);
 
   const handleAddPremises = (premises) => {
-    dispatch({ type: "ADD", payload: premises });
+    dispatch(addPremises(premises));
   };
 
   let table = null;
@@ -45,7 +51,7 @@ const PremisesPage = (props) => {
           <td>{premises.address.zipCode}</td>
           <td>{premises.address.city}</td>
           <td>
-            <div className="d-flex gap-1">            
+            <div className="d-flex gap-1">
               <Link
                 className="btn btn-sm btn-primary"
                 to={`premises/${premises.id}`}
@@ -53,9 +59,7 @@ const PremisesPage = (props) => {
                 Visa
               </Link>
               <button
-                onClick={() =>
-                  console.log("Clicked remove")
-                }
+                onClick={() => dispatch(removePremises(premises.id))}
                 className="btn btn-sm btn-danger"
               >
                 Radera
@@ -87,11 +91,8 @@ const PremisesPage = (props) => {
 
       <div className="card-body">
         <ModalDisplay ref={exampleModal} modal={modal}>
-          <PremisesForm          
-            handleAddPremises={handleAddPremises}
-          />
-        </ModalDisplay>        
-                
+          <PremisesForm handleAddPremises={handleAddPremises} />
+        </ModalDisplay>
 
         {table ? table : <p className="text-center">Skapa en lokal</p>}
       </div>
