@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import React, { useState, useReducer, useRef, useEffect } from "react";
 import { Modal } from "bootstrap";
-import { ModalForm } from "../ModalForm";
+import { PremisesForm } from "./PremisesForm";
+import ModalDisplay from "../layout/ModalDisplay";
 import Table from "../layout/Table";
 import { findAllPremises } from "../api/apiService";
 
@@ -96,12 +97,13 @@ const PremisesPage = (props) => {
         </div>
       </div>
 
-      <div className="card-body">        
-        <ModalForm
-          ref={exampleModal}
-          modal={modal}
-          handleAddPremises={handleAddPremises}
-        />        
+      <div className="card-body">
+        <ModalDisplay ref={exampleModal} modal={modal}>
+          <PremisesForm          
+            handleAddPremises={handleAddPremises}
+          />
+        </ModalDisplay>        
+                
 
         {table ? table : <p className="text-center">Skapa en lokal</p>}
       </div>
