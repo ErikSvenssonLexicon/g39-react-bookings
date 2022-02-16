@@ -1,37 +1,25 @@
 import { Link } from "react-router-dom";
 import React, { useState, useReducer, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setPremisesList, setIsLoading, setError } from "../redux/reducers/premisesListSlice";
 import { Modal } from "bootstrap";
 import { PremisesForm } from "./PremisesForm";
 import ModalDisplay from "../layout/ModalDisplay";
 import Table from "../layout/Table";
 import { findAllPremises } from "../api/apiService";
 
-const premisesListReducer = (state, action) => {
-  switch (action.type) {
-    case "ADD":
-      return [...state, action.payload];
-    case "REMOVE":
-      return state.filter((premises) => premises.id !== action.payload);
-    case "SET_ALL":
-      return action.payload;
-    case "CLEAR_ALL":
-      return [];
-    default:
-      return state;
-  }
-};
-
 const PremisesPage = (props) => {
+  const dispatch = useDispatch();
+  const {error, isLoading, premisesList} = useSelector(state => state.premisesListSlice);
   const [modal, setModal] = useState(null);  
   const exampleModal = useRef();  
-  const [premisesList, dispatch] = useReducer(premisesListReducer, []);
 
   useEffect(() => {
     setModal(new Modal(exampleModal.current));    
     findAllPremises()
-      .then((data) => dispatch({ type: "SET_ALL", payload: data }))
+      .then((data) => dispatch(setPremisesList(data)))
       .catch((err) => console.log(err));
-  }, []);
+  }, [dispatch]);
 
   const handleAddPremises = (premises) => {
     dispatch({ type: "ADD", payload: premises });
@@ -66,7 +54,7 @@ const PremisesPage = (props) => {
               </Link>
               <button
                 onClick={() =>
-                  dispatch({ type: "REMOVE", payload: premises.id })
+                  console.log("Clicked remove")
                 }
                 className="btn btn-sm btn-danger"
               >

@@ -8,7 +8,7 @@ const premisesListSlice = createSlice({
     error: null,
   },
   reducers: {
-    setPremiesList(state, action) {
+    setPremisesList(state, action) {
       return {
         ...state,
         premisesList: action.payload,
@@ -29,7 +29,7 @@ const premisesListSlice = createSlice({
   },
 });
 
-export const { setPremiesList, setIsLoading, setError } =
+export const { setPremisesList, setIsLoading, setError } =
   premisesListSlice.actions;
 
 export default premisesListSlice.reducer;
