@@ -1,8 +1,12 @@
 import axios from "axios";
 
 export const findAllPremises = async () => {
-  const response = await axios.get("http://localhost:8080/api/v1/premises");
-  return response.data;
+  try {
+    const response = await axios.get("http://localhost:8080/api/v1/premises");
+    return response.data;
+  } catch (err) {
+    return err.response.data;
+  }
 };
 
 export const postPremises = async (premises) => {

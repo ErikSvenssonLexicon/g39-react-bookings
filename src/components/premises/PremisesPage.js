@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setPremisesList,
   removePremises,
   addPremises,
 } from "../redux/reducers/premisesListSlice";
@@ -10,11 +9,12 @@ import { Modal } from "bootstrap";
 import { PremisesForm } from "./PremisesForm";
 import ModalDisplay from "../layout/ModalDisplay";
 import Table from "../layout/Table";
-import { findAllPremises } from "../api/apiService";
+import { findAllPremisesAction } from "./../redux/actions/premisesListActions";
+import Spinner from "../layout/Spinner";
 
 const PremisesPage = () => {
   const dispatch = useDispatch();
-  const { error, isLoading, premisesList } = useSelector(
+  const {isLoading, premisesList } = useSelector(
     (state) => state.premisesListSlice
   );
   const [modal, setModal] = useState(null);
@@ -22,9 +22,7 @@ const PremisesPage = () => {
 
   useEffect(() => {
     setModal(new Modal(exampleModal.current));
-    findAllPremises()
-      .then((data) => dispatch(setPremisesList(data)))
-      .catch((err) => console.log(err));
+    dispatch(findAllPremisesAction());
   }, [dispatch]);
 
   const handleAddPremises = (premises) => {
@@ -93,8 +91,9 @@ const PremisesPage = () => {
         <ModalDisplay ref={exampleModal} modal={modal}>
           <PremisesForm handleAddPremises={handleAddPremises} />
         </ModalDisplay>
-
-        {table ? table : <p className="text-center">Skapa en lokal</p>}
+        
+        {!isLoading && table ? table : <p className="text-center">Skapa en lokal</p>}
+        {isLoading && <Spinner />}
       </div>
     </div>
   );
