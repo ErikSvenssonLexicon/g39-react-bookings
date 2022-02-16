@@ -3,7 +3,7 @@ import premisesListSlice from "./reducers/premisesListSlice";
 
 const store = configureStore({
   reducer: {
-    premisesListSlice: premisesListSlice
+    premisesListState: premisesListSlice
   },
 });
 

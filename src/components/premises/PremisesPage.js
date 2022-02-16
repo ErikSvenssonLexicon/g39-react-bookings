@@ -9,14 +9,12 @@ import { Modal } from "bootstrap";
 import { PremisesForm } from "./PremisesForm";
 import ModalDisplay from "../layout/ModalDisplay";
 import Table from "../layout/Table";
-import { findAllPremisesAction } from "./../redux/actions/premisesListActions";
+import { findAllPremisesAction } from "../redux/actions/premisesListActions";
 import Spinner from "../layout/Spinner";
 
 const PremisesPage = () => {
   const dispatch = useDispatch();
-  const {isLoading, premisesList } = useSelector(
-    (state) => state.premisesListSlice
-  );
+  const {isLoading, premisesList } = useSelector(state => state.premisesListState) ;
   const [modal, setModal] = useState(null);
   const exampleModal = useRef();
 

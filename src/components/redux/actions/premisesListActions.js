@@ -8,9 +8,11 @@ import {
 
 import { findAllPremises } from "../../api/apiService";
 
+const PREMISES_LIST = "premisesList"
+
 
 export const findAllPremisesAction = createAsyncThunk(  
-  "premisesList/findAllPremises",
+  `${PREMISES_LIST}/findAllPremises`,
   async (payload,thunkAPI) => {
     try {
       thunkAPI.dispatch(setIsLoading(true));
