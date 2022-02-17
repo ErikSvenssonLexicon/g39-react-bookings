@@ -61,7 +61,7 @@ export const PremisesUpdateForm = React.forwardRef(
                 type="button"
                 className="btn-close"
                 onClick={() => modal.hide()}
-              ></button>
+              > </button>
             </div>
             <div className="modal-body">
               {errorMessage && (

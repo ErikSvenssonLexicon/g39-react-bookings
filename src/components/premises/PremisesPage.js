@@ -14,14 +14,18 @@ import Spinner from "../layout/Spinner";
 
 const PremisesPage = () => {
   const dispatch = useDispatch();
-  const {isLoading, premisesList } = useSelector(state => state.premisesListState) ;
+  const { premisesList, isLoading } = useSelector(
+    (state) => state.premisesListState
+  );
   const [modal, setModal] = useState(null);
   const exampleModal = useRef();
 
   useEffect(() => {
     setModal(new Modal(exampleModal.current));
-    dispatch(findAllPremisesAction());
-  }, [dispatch]);
+    if(premisesList && premisesList.length === 0){
+        dispatch(findAllPremisesAction());
+    }
+  }, [dispatch, premisesList]);
 
   const handleAddPremises = (premises) => {
     dispatch(addPremises(premises));
@@ -78,19 +82,26 @@ const PremisesPage = () => {
             </Link>
           </li>
         </ul>
-        <div>
+        <div className="d-flex gap-2">
           <button className="btn btn-success" onClick={() => modal.show()}>
-            Lägg till ny lokal
+            Skapa ny lokal
           </button>
+            <button className="btn btn-primary" onClick={() => dispatch(findAllPremisesAction())}>
+                Uppdatera ⟳
+            </button>
         </div>
       </div>
 
       <div className="card-body">
         <ModalDisplay ref={exampleModal} modal={modal}>
-          <PremisesForm handleAddPremises={handleAddPremises} />
+          <PremisesForm handleAddPremises={handleAddPremises}/>
         </ModalDisplay>
-        
-        {!isLoading && table ? table : <p className="text-center">Skapa en lokal</p>}
+
+        {!isLoading && table ? (
+          table
+        ) : (
+          <p className="text-center">Skapa en lokal</p>
+        )}
         {isLoading && <Spinner />}
       </div>
     </div>

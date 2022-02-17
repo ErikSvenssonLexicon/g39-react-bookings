@@ -1,6 +1,6 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import {setPremisesList, setError, setIsLoading, addPremises} from "../reducers/premisesListSlice";
-import { findAllPremises, postPremises } from "../../api/apiService";
+import {createAsyncThunk} from "@reduxjs/toolkit";
+import {setPremisesList, setIsLoading, setError} from "../reducers/premisesListSlice";
+import {findAllPremises} from "../../api/apiService";
 
 const PREMISES_LIST = "premisesList"
 
@@ -11,7 +11,6 @@ export const findAllPremisesAction = createAsyncThunk(
     try {
       thunkAPI.dispatch(setIsLoading(true));
       const response = await findAllPremises();
-      console.log(response)
       if (response.status) {
         thunkAPI.dispatch(setError(response));
       } else {
@@ -25,22 +24,3 @@ export const findAllPremisesAction = createAsyncThunk(
   }
 );
 
-export const addNewPremisesAction = createAsyncThunk(
-    `${PREMISES_LIST}/postPremises`,
-    async (premises, {dispatch}) =>{
-        try{
-            dispatch(setIsLoading(true))
-            const response = await postPremises(premises)
-            if(response.status >= 400){
-                console.log(response)
-                dispatch(setError(response))
-            }else{
-                dispatch(addPremises(response))
-            }
-        }catch (err){
-            console.log(err)
-        }finally {
-            dispatch(setIsLoading(false))
-        }
-    }
-)
