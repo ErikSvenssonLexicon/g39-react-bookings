@@ -20,6 +20,22 @@ const premisesListSlice = createSlice({
         premisesList: [...state.premisesList, action.payload],
       };
     },
+    replacePremises(state, action) {
+      const premises = action.payload;
+      const _premisesList = [...state.premisesList];
+      const index = _premisesList.findIndex(
+        (element) => element.id === premises.id
+      );
+      if (index < 0) {
+        return state;
+      } else {
+        _premisesList[index] = premises;
+        return {
+          ...state,
+          premisesList: _premisesList,
+        };
+      }
+    },
     removePremises(state, action) {
       return {
         ...state,
@@ -49,6 +65,7 @@ export const {
   removePremises,
   setIsLoading,
   setError,
+  replacePremises,
 } = premisesListSlice.actions;
 
 export default premisesListSlice.reducer;

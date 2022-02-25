@@ -1,14 +1,20 @@
 import { useEffect, useState, useRef, Fragment } from "react";
 import { useParams } from "react-router-dom";
+import {useSelector, useDispatch} from "react-redux";
+import {findPremisesByIdAction} from "../redux/actions/premisesListActions";
 import { Modal } from "bootstrap";
-import { findPremisesById, deleteBooking } from "../api/apiService";
+import {deleteBooking } from "../api/apiService";
 import Table from "../layout/Table";
 import BookingForm from "../bookings/BookingForm";
 import { PremisesUpdateForm } from "./PremisesUpdateForm";
 
 const Premises = (props) => {
+  const dispatch = useDispatch();
+  const {premisesList, error, isLoading} = useSelector((state) => state.premisesListState)
   const params = useParams();
   const id = params.id;
+  let _premises = premisesList.find(element => element.id === id)
+
 
   const [bookingForm, setBookingForm] = useState(null);
   const [updateForm, setUpdateForm] = useState(null);
@@ -16,21 +22,23 @@ const Premises = (props) => {
   const updateFormRef = useRef();
   const removeId = useRef(null);
 
-  const [premises, setPremises] = useState(null);
-  const [error, setError] = useState(null);
+  const [premises, setPremises] = useState(premisesList.find(element => element.id === id));
   const [isRemove, setIsRemove] = useState(false);
 
+  useEffect(() =>{
+    setBookingForm(new Modal(bookingFormRef.current));
+    setUpdateForm(new Modal(updateFormRef.current));
+  },[])
+
   useEffect(() => {
-    findPremisesById(id).then((data) => {
-      if (data.status) {
-        setError((old) => data);
-      } else {
-        setPremises((old) => data);
-      }
-      setBookingForm(new Modal(bookingFormRef.current));
-      setUpdateForm(new Modal(updateFormRef.current));
-    });
-  }, [id]);
+    if(_premises && _premises.bookings){
+      setPremises(_premises);
+    }else {
+      dispatch(findPremisesByIdAction(id));
+    }
+
+
+  }, [id, dispatch]);
 
   useEffect(() => {
     if (isRemove) {

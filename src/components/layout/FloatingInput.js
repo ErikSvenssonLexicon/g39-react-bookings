@@ -1,6 +1,19 @@
 import { Fragment } from "react";
 
 const FloatingInput = (props) => {
+  const errors = props.fieldErrors ? props.fieldErrors[props.field] : null;
+
+  let content = null;
+
+  if (errors) {
+    const listContent = errors.map((message, index) => (
+      <li key={index}>
+        <small className="text-danger">{message}</small>
+      </li>
+    ));
+    content = <ul className="p-0 m-0" style={{listStyle: "none"}}>{listContent}</ul>;
+  }
+
   return (
     <Fragment>
       <input
@@ -13,9 +26,8 @@ const FloatingInput = (props) => {
       />
       <label htmlFor={props.input.id}>{props.label}</label>
       <small className="text-danger">
-        {props.fieldErrors &&
-          props.fieldErrors[props.field] &&
-          props.fieldErrors[props.field].join(",")}
+          {content && content}
+
       </small>
     </Fragment>
   );

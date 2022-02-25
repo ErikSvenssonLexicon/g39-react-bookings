@@ -22,6 +22,21 @@ export const postPremises = async (premises) => {
   }
 };
 
+export const postPatient = async (patient) => {
+  try{
+    const response = await axios({
+      method: "post",
+      url: "http://localhost:8080/api/v1/public/register",
+      data: patient
+    });
+
+    return response.data;
+
+  }catch (err){
+    return err.response.data;
+  }
+}
+
 export const postBooking = async (premisesId, booking) => {
   try {
     const response = await axios({
