@@ -21,11 +21,15 @@ const PremisesPage = () => {
   const exampleModal = useRef();
 
   useEffect(() => {
+
     setModal(new Modal(exampleModal.current));
-    if(premisesList && premisesList.length === 0){
-        dispatch(findAllPremisesAction());
-    }
-  }, [dispatch, premisesList]);
+      if(!isLoading){
+          if(premisesList && premisesList.length === 0){
+              dispatch(findAllPremisesAction());
+          }
+      }
+
+  }, [dispatch, premisesList, isLoading]);
 
   const handleAddPremises = (premises) => {
     dispatch(addPremises(premises));

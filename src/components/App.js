@@ -11,6 +11,7 @@ import RegisterPatient from "./patient/RegisterPatient";
 import jwtDecode from "jwt-decode";
 import {useHistory} from "react-router-dom";
 import PatientLanding from "./patient/PatientLanding";
+import {setIsLoggedIn, setToken} from "./redux/reducers/authSlice";
 
 const App = (props) => {
   const dispatch = useDispatch();
@@ -19,16 +20,27 @@ const App = (props) => {
 
   useEffect(() => {
     if(!isLoggedIn){
-      const token = localStorage.getItem("booking-api");
+      const token = localStorage.getItem("booking_user");
       if(token){
         const decodedToken = jwtDecode(token);
-        console.log(decodedToken);
+        const tokenExpiryDate = new Date(decodedToken["exp"]);
+        const expiry = Math.floor(Date.now() / 1000);
+        if(tokenExpiryDate.getTime() < expiry){
+          history.push("/login")
+        }else {
+          if(decodedToken["authorities"].includes("ADMIN")){
+            history.push("/premises")
+          }else {
+            history.push("/patient-landing")
+          }
+          dispatch(setToken({token: token, userDetails: decodedToken}));
+          dispatch(setIsLoggedIn(true))
+        }
       }else {
         history.push("/index")
       }
     }
-
-  },[history, isLoggedIn])
+  },[history, isLoggedIn, dispatch])
 
   return (
     <React.Fragment>

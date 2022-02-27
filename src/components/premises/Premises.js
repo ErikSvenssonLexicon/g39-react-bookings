@@ -69,7 +69,7 @@ const Premises = (props) => {
   };
 
   let table = null;
-  if (premises && premises.bookings.length > 0) {
+  if (premises && premises.bookings && premises.bookings.length > 0) {
     const headJsx = (
       <tr key="bookings-columns">
         <th scope="col">Tid</th>

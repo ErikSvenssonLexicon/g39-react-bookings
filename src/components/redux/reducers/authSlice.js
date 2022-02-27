@@ -5,7 +5,6 @@ const authSlice = createSlice({
     name: "auth",
     initialState: {
         isLoggedIn: false,
-        loggedInUser: null,
         patient: null,
         token: null,
         isLoading: false,
@@ -23,12 +22,6 @@ const authSlice = createSlice({
             return{
                 ...state,
                 error: action.payload
-            }
-        },
-        setLoggedInUser(state, action){
-            return{
-                ...state,
-                loggedInUser: action.payload
             }
         },
         setPatient(state, action){
@@ -53,5 +46,5 @@ const authSlice = createSlice({
     }
 })
 
-export const {setPatient, setIsLoggedIn, setLoggedInUser, setError, setIsLoading, setToken} = authSlice.actions;
+export const {setPatient, setIsLoggedIn, setError, setIsLoading, setToken} = authSlice.actions;
 export default authSlice.reducer;
