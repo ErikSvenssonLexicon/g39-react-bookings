@@ -5,6 +5,25 @@ import jwtDecode from "jwt-decode";
 
 const AUTH = "auth";
 
+export const fetchPatientData = createAsyncThunk(
+    `${AUTH}/fetchPatientData`,
+    async (id, {dispatch}) => {
+        try {
+            dispatch(setIsLoading(true));
+            const response = await findPatientById(id);
+            if(response.status >= 400){
+                dispatch(setError(response))
+            }else{
+                dispatch(setPatient(response))
+            }
+        }catch (err){
+            console.log(err)
+        }finally {
+            dispatch(setIsLoading(false));
+        }
+    }
+)
+
 export const loginAction = createAsyncThunk(
     `${AUTH}/login`,
     async ({loginCommand}, {dispatch}) => {

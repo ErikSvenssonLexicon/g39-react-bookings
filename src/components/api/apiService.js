@@ -85,7 +85,9 @@ export const findPremisesById = async (id) => {
 export const updatePremises = async (premises) => {
   try {
     const response = await axios({
-      headers: authHeader(),
+      headers: {
+        Authorization: authHeader()
+      },
       method: "put",
       url: `http://localhost:8080/api/v1/premises/${premises.id}`,
       data: premises,
@@ -100,7 +102,9 @@ export const updatePremises = async (premises) => {
 export const deleteBooking = async (id) => {
   try {
     const response = await axios({
-      headers: authHeader(),
+      headers: {
+        Authorization: authHeader()
+      },
       method: "delete",
       url: `http://localhost:8080/api/v1/bookings/${id}`,
     });
@@ -127,7 +131,9 @@ export const login = async (loginCommand) => {
 export const findPatientById = async  (id) =>{
   try{
     const response = await axios({
-      headers: authHeader(),
+      headers: {
+        Authorization: authHeader()
+      },
       method: "get",
       url: `http://localhost:8080/api/v1/patients/${id}`
     })

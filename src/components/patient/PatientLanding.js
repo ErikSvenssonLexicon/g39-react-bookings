@@ -1,7 +1,35 @@
+import {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {fetchPatientData} from "../redux/actions/authActions";
+import jwtDecode from "jwt-decode";
+import {setToken} from "../redux/reducers/authSlice";
+
 
 const PatientLanding = props => {
+    const dispatch = useDispatch();
+    const {patient, userDetails} = useSelector(state => state.authState)
+
+
+
+
+    useEffect(() => {
+        if(!patient){
+            let id = null
+            if(userDetails && userDetails.patientId){
+                id = userDetails.patientId;
+            }else{
+                const token = localStorage.getItem("booking_user");
+                const decodedToken = jwtDecode(token);
+                dispatch(setToken({token: token, userDetails: decodedToken}));
+                id = decodedToken.patientId;
+            }
+            dispatch(fetchPatientData(id))
+        }
+
+    },[dispatch,patient, userDetails])
+
     return (
-        <div className="container-fluid d-flex justify-content-center bg-img align-items-center ">
+        <div className="container-fluid d-flex justify-content-center align-items-center ">
             <div className="col col-md-8 col-sm-12">
                 <div className="card shadow">
                     <div className="card-header">
