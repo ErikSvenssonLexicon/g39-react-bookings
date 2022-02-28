@@ -1,40 +1,38 @@
 import { Link } from "react-router-dom";
-import React, { useState, useReducer, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  removePremises,
+  addPremises,
+} from "../redux/reducers/premisesListSlice";
 import { Modal } from "bootstrap";
 import { PremisesForm } from "./PremisesForm";
 import ModalDisplay from "../layout/ModalDisplay";
 import Table from "../layout/Table";
-import { findAllPremises } from "../api/apiService";
+import { findAllPremisesAction } from "../redux/actions/premisesListActions";
+import Spinner from "../layout/Spinner";
 
-const premisesListReducer = (state, action) => {
-  switch (action.type) {
-    case "ADD":
-      return [...state, action.payload];
-    case "REMOVE":
-      return state.filter((premises) => premises.id !== action.payload);
-    case "SET_ALL":
-      return action.payload;
-    case "CLEAR_ALL":
-      return [];
-    default:
-      return state;
-  }
-};
-
-const PremisesPage = (props) => {
-  const [modal, setModal] = useState(null);  
-  const exampleModal = useRef();  
-  const [premisesList, dispatch] = useReducer(premisesListReducer, []);
+const PremisesPage = () => {
+  const dispatch = useDispatch();
+  const { premisesList, isLoading } = useSelector(
+    (state) => state.premisesListState
+  );
+  const [modal, setModal] = useState(null);
+  const exampleModal = useRef();
 
   useEffect(() => {
-    setModal(new Modal(exampleModal.current));    
-    findAllPremises()
-      .then((data) => dispatch({ type: "SET_ALL", payload: data }))
-      .catch((err) => console.log(err));
-  }, []);
+
+    setModal(new Modal(exampleModal.current));
+      if(!isLoading){
+          if(premisesList && premisesList.length === 0){
+              dispatch(findAllPremisesAction());
+          }
+      }
+
+  }, [dispatch, premisesList, isLoading]);
 
   const handleAddPremises = (premises) => {
-    dispatch({ type: "ADD", payload: premises });
+    dispatch(addPremises(premises));
   };
 
   let table = null;
@@ -57,7 +55,7 @@ const PremisesPage = (props) => {
           <td>{premises.address.zipCode}</td>
           <td>{premises.address.city}</td>
           <td>
-            <div className="d-flex gap-1">            
+            <div className="d-flex gap-1">
               <Link
                 className="btn btn-sm btn-primary"
                 to={`premises/${premises.id}`}
@@ -65,9 +63,7 @@ const PremisesPage = (props) => {
                 Visa
               </Link>
               <button
-                onClick={() =>
-                  dispatch({ type: "REMOVE", payload: premises.id })
-                }
+                onClick={() => dispatch(removePremises(premises.id))}
                 className="btn btn-sm btn-danger"
               >
                 Radera
@@ -90,22 +86,27 @@ const PremisesPage = (props) => {
             </Link>
           </li>
         </ul>
-        <div>
+        <div className="d-flex gap-2">
           <button className="btn btn-success" onClick={() => modal.show()}>
-            Lägg till ny lokal
+            Skapa ny lokal
           </button>
+            <button className="btn btn-primary" onClick={() => dispatch(findAllPremisesAction())}>
+                Uppdatera ⟳
+            </button>
         </div>
       </div>
 
       <div className="card-body">
         <ModalDisplay ref={exampleModal} modal={modal}>
-          <PremisesForm          
-            handleAddPremises={handleAddPremises}
-          />
-        </ModalDisplay>        
-                
+          <PremisesForm handleAddPremises={handleAddPremises}/>
+        </ModalDisplay>
 
-        {table ? table : <p className="text-center">Skapa en lokal</p>}
+        {!isLoading && table ? (
+          table
+        ) : (
+          <p className="text-center">Skapa en lokal</p>
+        )}
+        {isLoading && <Spinner />}
       </div>
     </div>
   );
