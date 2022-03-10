@@ -14,22 +14,14 @@ import Spinner from "../layout/Spinner";
 
 const PremisesPage = () => {
   const dispatch = useDispatch();
-  const { premisesList, isLoading } = useSelector(
-    (state) => state.premisesListState
-  );
+  const { premisesList, isLoading } = useSelector((state) => state.premisesListState);
   const [modal, setModal] = useState(null);
   const exampleModal = useRef();
 
   useEffect(() => {
-
     setModal(new Modal(exampleModal.current));
-      if(!isLoading){
-          if(premisesList && premisesList.length === 0){
-              dispatch(findAllPremisesAction());
-          }
-      }
-
-  }, [dispatch, premisesList, isLoading]);
+    dispatch(findAllPremisesAction());
+  }, [dispatch]);
 
   const handleAddPremises = (premises) => {
     dispatch(addPremises(premises));

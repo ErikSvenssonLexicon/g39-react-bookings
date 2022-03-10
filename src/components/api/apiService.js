@@ -11,7 +11,7 @@ export const authHeader = () => {
 export const findAllPremises = async () => {
   try {
     const response = await axios.get("http://localhost:8080/api/v1/premises",
-        {headers: {Authorization: authHeader().toString()}}
+        {headers: {Authorization: authHeader()}}
     );
     return response.data;
   } catch (err) {
