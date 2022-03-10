@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useReducer, useEffect} from "react";
 import {useSelector, useDispatch} from "react-redux";
 import {resetState} from "../redux/reducers/httpRequestSlice";
 import {addNewBookingAction} from "../redux/actions/formActions";
@@ -6,18 +6,60 @@ import FloatingFormGroup from "../layout/FloatingFormGroup";
 import FloatingInput from "../layout/FloatingInput";
 import Spinner from "../layout/Spinner";
 
-const BookingForm = ({handleAddBooking, premisesId, closeModal}) => {
 
+const bookingInitialState = {
+        id: null,
+        dateTime: "",
+        price: "",
+        administratorId: "",
+        vaccineType: "",
+        vacant: true
+}
+
+const bookingFormReducer = (state, action) => {
+    switch (action.type){
+        case "SET_VACCINE_TYPE":
+            return {
+                ...state,
+                vaccineType: action.payload
+            }
+        case "SET_DATE_TIME":
+            return {
+                ...state,
+                dateTime: action.payload
+            }
+        case "SET_PRICE":
+            return {
+                ...state,
+                price: action.payload
+            }
+        case "SET_VACANT":
+            return {
+                ...state,
+                vacant: action.payload
+            }
+        case "SET_ADMINISTRATOR_ID":
+            return {
+                ...state,
+                administratorId: action.payload
+            }
+        case "SET_BOOKING":
+            return action.payload ? action.payload : bookingInitialState
+        default:
+            return state;
+    }
+
+}
+
+
+const BookingForm = ({handleAddBooking, premisesId, closeModal, method, _booking}) => {
+    let initialState = _booking ? _booking : bookingInitialState
     const dispatch = useDispatch();
     const {isLoading, error, fieldErrors, object} = useSelector(
         (state) => state.httpRequestState
     );
 
-    const [booking, setBooking] = useState({
-        vaccineType: "",
-        dateTime: "",
-        price: "",
-    });
+    const[booking, bookingDispatch] = useReducer(bookingFormReducer, initialState);
 
     useEffect(() => {
         dispatch(resetState())
@@ -27,57 +69,31 @@ const BookingForm = ({handleAddBooking, premisesId, closeModal}) => {
         if(object != null){
             handleAddBooking(object);
             dispatch(resetState());
-            setBooking({
-                vaccineType: "",
-                dateTime: "",
-                price: ""
-            })
+            bookingDispatch({type: "SET_BOOKING", payload: initialState})
             closeModal();
         }
 
-    },[object, dispatch, handleAddBooking, closeModal])
+    },[object, dispatch, handleAddBooking, closeModal, initialState])
 
-    const handleVaccineChange = (e) => {
-        setBooking((prevState) => {
-            return {
-                ...prevState,
-                vaccineType: e.target.value,
-            };
-        });
-    };
-
-    const handleDateTimeChange = (e) => {
-        setBooking((prevState) => {
-            return {
-                ...prevState,
-                dateTime: e.target.value,
-            };
-        });
-    };
-
-    const handlePriceChange = (e) => {
-        setBooking((prevState) => {
-            return {
-                ...prevState,
-                price: e.target.value,
-            };
-        });
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(addNewBookingAction({booking: booking, premisesId: premisesId}))
+        if(method === "post"){
+            dispatch(addNewBookingAction({booking: booking, premisesId: premisesId}))
+        }
+
     };
 
     const handleReset = (e) => {
         e.preventDefault();
-        setBooking({
-            vaccineType: "",
-            dateTime: "",
-            price: "",
-        });
+        bookingDispatch({type: "SET_BOOKING", payload: initialState})
         dispatch(resetState())
     };
+
+    const handleCheckboxEvent = (e) => {
+        const vacant = !!e.target.checked;
+        bookingDispatch({type: "SET_VACANT", payload: vacant})
+    }
 
     return (
         <React.Fragment>
@@ -87,7 +103,7 @@ const BookingForm = ({handleAddBooking, premisesId, closeModal}) => {
                 <FloatingFormGroup className="mb-2">
                     <FloatingInput
                         label="Vaccin:" field="vaccineType" fieldErrors={fieldErrors} input={{
-                        id: "vaccine", type: "text", value: booking.vaccineType, onChange: handleVaccineChange
+                        id: "vaccine", type: "text", value: booking.vaccineType, onChange: (e) => bookingDispatch({type: "SET_VACCINE_TYPE", payload: e.target.value})
                     }}
                     />
                 </FloatingFormGroup>
@@ -99,7 +115,7 @@ const BookingForm = ({handleAddBooking, premisesId, closeModal}) => {
                             id: "dateTime",
                             type: "datetime-local",
                             value: booking.dateTime,
-                            onChange: handleDateTimeChange
+                            onChange: (e) => bookingDispatch({type: "SET_DATE_TIME", payload: e.target.value})
                         }}
                         />
                     </FloatingFormGroup>
@@ -111,16 +127,34 @@ const BookingForm = ({handleAddBooking, premisesId, closeModal}) => {
                             min: "0",
                             step: "0.1",
                             value: booking.price,
-                            onChange: handlePriceChange
+                            onChange: (e) => bookingDispatch({type: "SET_PRICE", payload: e.target.value})
                         }}
                         />
                     </FloatingFormGroup>
                 </div>
+                {method && method === "put" &&
+                <FloatingFormGroup className="mb-2">
+                    <FloatingInput
+                        label="Vaccin administratör:" field="administratorId" fieldErrors={fieldErrors} input={{
+                        id: "administratorId",
+                        type: "text",
+                        value: booking.administratorId,
+                        onChange: (e) => bookingDispatch({type: "SET_ADMINISTRATOR_ID", payload: e.target.value})
+                    }}
+                    />
+                </FloatingFormGroup>}
+                {method && method === "put" &&
+                <div className="form-check">
+                    <input className="form-check-input" type="checkbox" id="vacant" checked={booking.vacant} onChange={handleCheckboxEvent}/>
+                    <label className="form-check-label" htmlFor="vacant">
+                        Tillgänglig:
+                    </label>
+                </div>}
                 <div className="d-grid g-2 gap-2">
                     <button type="submit" className="btn btn-success">
                         Skapa
                     </button>
-                    <button type="reset" className="btn btn-success">
+                    <button type="reset" className="btn btn-danger">
                         Rensa
                     </button>
                 </div>
