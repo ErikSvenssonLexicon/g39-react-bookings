@@ -6,9 +6,9 @@ import {Modal} from "bootstrap";
 import {deleteBooking} from "../api/apiService";
 import Table from "../layout/Table";
 import BookingForm from "../bookings/BookingForm";
-import {PremisesUpdateForm} from "./PremisesUpdateForm";
 import {replacePremises} from "../redux/reducers/premisesListSlice";
 import ModalDisplay from "../layout/ModalDisplay";
+import {PremisesForm} from "./PremisesForm";
 
 const Premises = () => {
     const history = useHistory();
@@ -140,14 +140,11 @@ const Premises = () => {
                 {!isLoading && premises &&
                 <Fragment>
                     <ModalDisplay ref={bookingFormRef} title="Ny bokning:" modal={bookingForm}>
-                        <BookingForm premisesId={id} handleAddBooking={handleAddBooking}/>
+                        <BookingForm method="post" premisesId={id} handleAddBooking={handleAddBooking}/>
                     </ModalDisplay>
-                    <PremisesUpdateForm
-                        ref={updateFormRef}
-                        modal={updateForm}
-                        _premises={premises}
-                        handleSetUpdatedPremises={handleSetUpdatedPremises}
-                    />
+                    <ModalDisplay  ref={updateFormRef} title="Uppdatera lokal:" modal={updateForm}>
+                        <PremisesForm method="put" _premises={premises} handleSetUpdatedPremises={handleSetUpdatedPremises}/>
+                    </ModalDisplay>
 
                     <h5 className="card-title mb-2">{`Lokal: ${premises.name}`}</h5>
                     <hr/>

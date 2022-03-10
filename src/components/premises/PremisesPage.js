@@ -89,8 +89,8 @@ const PremisesPage = () => {
       </div>
 
       <div className="card-body">
-        <ModalDisplay ref={exampleModal} modal={modal}>
-          <PremisesForm handleAddPremises={handleAddPremises}/>
+        <ModalDisplay ref={exampleModal} modal={modal} title="Ny lokal:">
+          <PremisesForm handleAddPremises={handleAddPremises} method="post"/>
         </ModalDisplay>
 
         {!isLoading && table ? (

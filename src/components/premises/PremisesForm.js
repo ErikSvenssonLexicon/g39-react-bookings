@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { addNewPremisesAction } from "../redux/actions/formActions";
+import React, { useEffect, useReducer } from "react";
+import { addNewPremisesAction, updatePremisesAction } from "../redux/actions/formActions";
 import { resetState } from "../redux/reducers/httpRequestSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../layout/Spinner";
 import FloatingFormGroup from "../layout/FloatingFormGroup";
 import FloatingInput from "../layout/FloatingInput";
+import premisesReducer,{initialState} from "../reducers/premisesReducer";
 
 export const PremisesForm = (props) => {
+  let _premises = props._premises ? props._premises : initialState;
   const dispatch = useDispatch();
   const { isLoading, error, fieldErrors, object } = useSelector(
-    (state) => state.httpRequestState
-  );
+    (state) => state.httpRequestState)
 
-  const [name, setName] = useState("");
-  const [streetAddress, setStreetAddress] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [city, setCity] = useState("");
+  const [premises, premisesDispatch] = useReducer(premisesReducer, _premises)
+
 
   useEffect(() => {
     dispatch(resetState());
@@ -23,39 +22,41 @@ export const PremisesForm = (props) => {
 
   useEffect(() => {
     if (object) {
-      props.handleAddPremises(object);
+        if(props.method === "put"){
+            props.handleSetUpdatedPremises(object);
+        }
+        if(props.method === "post"){
+            props.handleAddPremises(object);
+        }
       dispatch(resetState());
       props.closeModal();
 
-      return () => {
-        setName("");
-        setStreetAddress("");
-        setZipCode("");
-        setCity("");
-      };
+      return () => {premisesDispatch({
+        type: "SET_PREMISES", payload: null
+      })}
     }
-  }, [object, props, dispatch]);
+  }, [object, props, dispatch, premisesDispatch]);
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    const premises = {
-      name: name,
-      address: {
-        streetAddress: streetAddress,
-        zipCode: zipCode,
-        city: city,
-      },
-    };
-    dispatch(addNewPremisesAction({ premises }));
+    if(props.method === "post"){
+      dispatch(addNewPremisesAction({premises}));
+    }
+    if(props.method === "put"){
+      dispatch(updatePremisesAction({premises}));
+    }
   };
 
   const onResetHandler = (e) => {
     e.preventDefault();
     dispatch(resetState());
-    setZipCode("");
-    setCity("");
-    setName("");
-    setStreetAddress("");
+    let payload = null;
+    if(props.method === "post"){
+      payload = initialState;
+    }else if(props.method === "put"){
+      payload = props._premises;
+    }
+    premisesDispatch({type: "SET_PREMISES", payload: payload})
   };
 
   return (
@@ -71,8 +72,8 @@ export const PremisesForm = (props) => {
             input={{
               id: "name",
               type: "text",
-              value: name,
-              onChange: (e) => setName(e.target.value),
+              value: premises.name,
+              onChange: (e) => premisesDispatch({type: "SET_NAME", payload: e.target.value})
             }}
           />
         </FloatingFormGroup>
@@ -84,8 +85,8 @@ export const PremisesForm = (props) => {
             input={{
               id: "streetAddress",
               type: "text",
-              value: streetAddress,
-              onChange: (e) => setStreetAddress(e.target.value),
+              value: premises.address.streetAddress,
+              onChange: (e) => premisesDispatch({type: "SET_STREET_ADDRESS", payload: e.target.value})
             }}
           />
         </FloatingFormGroup>
@@ -98,8 +99,8 @@ export const PremisesForm = (props) => {
               input={{
                 id: "zipCode",
                 type: "text",
-                value: zipCode,
-                onChange: (e) => setZipCode(e.target.value),
+                value: premises.address.zipCode,
+                onChange: (e) => premisesDispatch({type: "SET_ZIP_CODE", payload: e.target.value}),
               }}
             />
           </FloatingFormGroup>
@@ -112,15 +113,15 @@ export const PremisesForm = (props) => {
               input={{
                 id: "city",
                 type: "text",
-                value: city,
-                onChange: (e) => setCity(e.target.value),
+                value: premises.address.city,
+                onChange: (e) => premisesDispatch({type: "SET_CITY", payload: e.target.value}),
               }}
             />
           </FloatingFormGroup>
         </div>
         <div className="d-grid g-2 gap-2">
           <button type="submit" className="btn btn-success">
-            Skicka
+            {props.method === "post" ? "Skapa" : "Uppdatera"}
           </button>
           <button
             type="reset"
